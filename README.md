@@ -1,7 +1,7 @@
 DCGen - Dynamic Content Generator
 ======
 
-Implementation of the text content generator that accepts content templates and translates them into the result content. Templates contains the text that should be generated and specific blocks with user scripts. Script blocks drives the generating of the result content. Script blocks are determined with the starting sequence of some characters eg. <?, <%, <: and with the ending sequence eg. ?>, %>, :>. But it is easy to define the custom way how to recognize the script blocks inside templates. So one could define for the starting sequence the $ and as the closing character the empty space ' '. This specification might be used for the outputing the the script or model variables.
+Implementation of the text content generator that accepts content templates and translates them into the result content. Templates contains the text that should be generated and specific blocks with user scripts. Script blocks drives the generating of the result content. Script blocks are determined with the starting sequence of some characters eg. `<?`, `<%`, `<:` and with the ending sequence eg. `?>`, `%>`, `:>`. But it is easy to define the custom way how to recognize the script blocks inside templates. So one could define for the starting sequence the `$` and as the closing character the empty space `' '`. This specification might be used for the outputing the the script or model variables.
 
 ## Features
 - Easy to insert the custom script engine which you like and which will be used for the generating of the result content. All what is neccesary is that engine has to implement the JSR 223 interface.
