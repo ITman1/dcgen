@@ -24,7 +24,4 @@ public abstract class ScriptBlock {
 	}
 	
 	public abstract String generate(String script);
-	
-	protected void templateStartScriptBlockCorrection(String template, MarkMatchResult templateCharsMatched) {
-	}
 }

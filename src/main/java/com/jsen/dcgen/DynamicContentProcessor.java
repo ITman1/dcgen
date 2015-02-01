@@ -1,16 +1,39 @@
 package com.jsen.dcgen;
 
-import com.jsen.dcgen.blocks.anglebracket.AngleBracketSettings;
+import javax.script.ScriptException;
 
-public class TemplateScriptGeneratoressor {
+import com.jsen.dcgen.blocks.anglebracket.AngleBracketSettings;
+import com.jsen.dcgen.script.ScriptEngineContentGenerator;
+import com.jsen.dcgen.script.engines.JavaScriptEngineContentGenerator;
+
+public class DynamicContentProcessor {
 	
-	public String process(String template) {
-		return process(template, new AngleBracketSettings());		
+	private ScriptEngineContentGenerator generator;
+	private Class<? extends ScriptBlocksSettings> scriptBlocksSettingsClazz;
+	
+	public DynamicContentProcessor() {
+		this(new JavaScriptEngineContentGenerator(), AngleBracketSettings.class);
 	}
 	
-	public String process(String template, ScriptBlocksSettings scriptBlocksSettings) {		
-		StringBuilder scriptStringBuilder = new StringBuilder();
-		MarkMatchResult templateCharsMatched = new MarkMatchResult(0, 0);
+	public DynamicContentProcessor(Class<? extends ScriptBlocksSettings> scriptBlocksSettingsClazz) {
+		this(new JavaScriptEngineContentGenerator(), scriptBlocksSettingsClazz);
+	}
+	
+	public DynamicContentProcessor(ScriptEngineContentGenerator generator) {
+		this(generator, AngleBracketSettings.class);
+	}
+	
+	public DynamicContentProcessor(ScriptEngineContentGenerator generator, Class<? extends ScriptBlocksSettings> scriptBlocksSettingsClazz) {
+		this.generator = generator;
+		this.scriptBlocksSettingsClazz = scriptBlocksSettingsClazz;
+	}
+	
+	public String process(String template) throws ScriptException, InstantiationException, IllegalAccessException {
+		return process(template, scriptBlocksSettingsClazz.newInstance());		
+	}
+	
+	public String process(String template, ScriptBlocksSettings scriptBlocksSettings) throws ScriptException {	
+	MarkMatchResult templateCharsMatched = new MarkMatchResult(0, 0);
 		
 		ScriptBlock startedScriptBlock = null;
 		for (int i = 0; i < template.length(); i++) {
@@ -25,25 +48,21 @@ public class TemplateScriptGeneratoressor {
 					if (scriptBlock.matchedStart.match(i, c)) {
 						startedScriptBlock = scriptBlock;
 						templateCharsMatched.chars = templateCharsMatched.chars - startedScriptBlock.matchedStart.tokenString.length();
-						//startedScriptBlock.templateStartScriptBlockCorrection(template, templateCharsMatched);
 						break;
 					}
 				}
 			}
 			
 			if (startedScriptBlock != null && templateCharsMatched.chars > 0) {
-				scriptStringBuilder.append("write('");
-				scriptStringBuilder.append(template.substring(templateCharsMatched.pos, templateCharsMatched.pos + templateCharsMatched.chars).replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n").replace("'", "\\'"));
-				scriptStringBuilder.append("');\n");
+				generator.getContentScriptBuilder().outputString(template.substring(templateCharsMatched.pos, templateCharsMatched.pos + templateCharsMatched.chars));
 				templateCharsMatched.chars = 0;
 			}
 			
 			if (startedScriptBlock != null && startedScriptBlock.matchedEnd.match(i, c)) {
-				scriptStringBuilder.append(startedScriptBlock.extractAndGenerate(template));
+				generator.getContentScriptBuilder().append(startedScriptBlock.extractAndGenerate(template));
 				templateCharsMatched.pos = i + 1;
 				templateCharsMatched.chars = 0;
 				startedScriptBlock = null;
-				//endCorrection(template, i, templateCharsMatched);
 				
 				for (ScriptBlock scriptBlock : scriptBlocksSettings.getScriptBlocks()) {
 					scriptBlock.clear();
@@ -52,28 +71,11 @@ public class TemplateScriptGeneratoressor {
 		}
 		
 		if (templateCharsMatched.chars != 0) {
-			scriptStringBuilder.append("write('");
-			scriptStringBuilder.append(template.substring(templateCharsMatched.pos, templateCharsMatched.pos + templateCharsMatched.chars).replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n").replace("'", "\\'"));
-			scriptStringBuilder.append("');\n");
+			generator.getContentScriptBuilder().outputString(template.substring(templateCharsMatched.pos, templateCharsMatched.pos + templateCharsMatched.chars));
 		}
 		
-		return scriptStringBuilder.toString();
-			
+		String script = generator.getContentScriptBuilder().build();
+		return generator.generate(script);
 	}
 	
-	private void endCorrection(String template, int i, MarkMatchResult templateCharsMatched) {
-		boolean wasEmpty = true;
-		for (int j = i + 1; j < template.length(); j++) {
-			char d = template.charAt(j);
-			boolean isEmpty = d == '\t' || d == ' ';
-			if (wasEmpty && d == '\r' || d == '\n') {
-				templateCharsMatched.pos = j;
-				break;
-			} else if (!isEmpty) {
-				break;
-			}
-			wasEmpty = isEmpty;
-		}
-	}
-
 }

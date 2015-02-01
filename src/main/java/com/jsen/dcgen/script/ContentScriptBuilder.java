@@ -1,18 +1,38 @@
 package com.jsen.dcgen.script;
 
-import javax.script.ScriptEngine;
 
 public abstract class ContentScriptBuilder {
-	private ScriptEngine scriptEngine;
+	private StringBuilder scriptStringBuilder = new StringBuilder();
 	
-	public ContentScriptBuilder(ScriptEngine scriptEngine) {
-		this.scriptEngine = scriptEngine;
+	protected String outputFunctionName;
+	protected String flushFunctionName;
+	
+	protected ContentScriptBuilder() {
+		this.outputFunctionName = defineOutputFunction();
+		this.flushFunctionName = defineFlushFunction();
 	}
 	
-	public ScriptEngine getScriptEngine() {
-		return this.scriptEngine;
-	}
+	public abstract String defineOutputFunction();
+	public abstract String defineFlushFunction();
 	
-	public abstract void output(String variable);
+	public abstract void outputVariable(String variable);
 	public abstract void outputString(String text);
+	
+	public String getOutputFunctionName() {
+		return outputFunctionName;
+	}
+	
+	public String getFlushFunctionName() {
+		return flushFunctionName;
+	}
+	
+	public void append(String script) {
+		scriptStringBuilder.append(script);
+	}
+	
+	public String build() {
+		String script = scriptStringBuilder.toString();
+		scriptStringBuilder = new StringBuilder();
+		return script;
+	}
 }
