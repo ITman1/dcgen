@@ -10,13 +10,13 @@ import com.jsen.dcgen.script.engines.NativeJavaScriptEngineContentGenerator;
 
 public class ScriptContentGeneratorsTest {
 
-	@Test
+	/*@Test
 	public void jsenJs() throws ScriptException, InstantiationException, IllegalAccessException {
 		DynamicContentProcessor processor = new DynamicContentProcessor();
 	
 		String output = processor.process("test");
 		Assert.assertEquals("test", output);
-	}
+	}*/
 	
 	@Test
 	public void nativeJs() throws ScriptException, InstantiationException, IllegalAccessException {
