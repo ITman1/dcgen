@@ -1,8 +1,12 @@
 package com.jsen.dcgen;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import javax.script.ScriptException;
 
 import com.jsen.dcgen.blocks.anglebracket.AngleBracketSettings;
+import com.jsen.dcgen.script.ContentScriptBuilder;
 import com.jsen.dcgen.script.ScriptEngineContentGenerator;
 import com.jsen.dcgen.script.engines.JavaScriptEngineContentGenerator;
 
@@ -28,8 +32,10 @@ public class DynamicContentProcessor {
 		this.scriptBlocksSettingsClazz = scriptBlocksSettingsClazz;
 	}
 	
-	public String process(String template) throws ScriptException, InstantiationException, IllegalAccessException {
-		return process(template, scriptBlocksSettingsClazz.newInstance());		
+	public String process(String template) throws ScriptException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		Constructor<? extends ScriptBlocksSettings> settingsConstructor = scriptBlocksSettingsClazz.getConstructor(ContentScriptBuilder.class);
+		ScriptBlocksSettings settings = settingsConstructor.newInstance(generator.getContentScriptBuilder());
+		return process(template, settings);		
 	}
 	
 	public String process(String template, ScriptBlocksSettings scriptBlocksSettings) throws ScriptException {	
@@ -59,7 +65,7 @@ public class DynamicContentProcessor {
 			}
 			
 			if (startedScriptBlock != null && startedScriptBlock.matchedEnd.match(i, c)) {
-				generator.getContentScriptBuilder().append(startedScriptBlock.extractAndGenerate(template));
+				startedScriptBlock.extractAndGenerate(template);
 				templateCharsMatched.pos = i + 1;
 				templateCharsMatched.chars = 0;
 				startedScriptBlock = null;

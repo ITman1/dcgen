@@ -1,5 +1,7 @@
 package com.jsen.dcgen.test;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.script.ScriptException;
 
 import org.junit.Assert;
@@ -19,7 +21,7 @@ public class ScriptContentGeneratorsTest {
 	}*/
 	
 	@Test
-	public void nativeJs() throws ScriptException, InstantiationException, IllegalAccessException {
+	public void nativeJs() throws ScriptException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		DynamicContentProcessor processor = new DynamicContentProcessor(new NativeJavaScriptEngineContentGenerator());
 	
 		String output = processor.process("test");
