@@ -26,8 +26,13 @@ public abstract class ScriptBlock {
 	}
 	
 	public String extract(String template) {
-		return template.substring(this.matchedStart.pos + this.matchedStart.tokenString.length(), this.matchedEnd.pos -1).trim();
+		return template.substring(this.matchedStart.pos + this.matchedStart.tokenString.length(), this.matchedEnd.pos).trim();
+	}
+	
+	public String trailingString(String template) {
+		return "";
 	}
 	
 	public abstract void generate(String script);
+	
 }

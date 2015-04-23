@@ -66,6 +66,8 @@ public class DynamicContentProcessor {
 			
 			if (startedScriptBlock != null && startedScriptBlock.matchedEnd.match(i, c)) {
 				startedScriptBlock.extractAndGenerate(template);
+				String trailingString = startedScriptBlock.trailingString(template);
+				i += trailingString.length();
 				templateCharsMatched.pos = i + 1;
 				templateCharsMatched.chars = 0;
 				startedScriptBlock = null;
